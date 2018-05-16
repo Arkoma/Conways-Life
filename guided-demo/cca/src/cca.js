@@ -79,7 +79,7 @@ class CCA {
 
 			// north
 			if (row > 0) {
-				if (currentBuffer[row - 1][col] === nextValue) {
+				if (currentBuffer[row - 1][col] === nextValue + Math.PI) {
 					return true;
 				}
 			}
@@ -115,7 +115,6 @@ class CCA {
 		}
 		this.currentBufferIndex = this.currentBufferIndex === 0 ? 1 : 0;
   }
-
 }
 
 export default CCA;
