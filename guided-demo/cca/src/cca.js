@@ -17,6 +17,7 @@ function Array2D(width, height) {
   
 	return a;
 }
+
   
 /**
  * CCA class
@@ -29,7 +30,12 @@ class CCA {
   constructor(width, height) {
     this.width = width;
     this.height = height;
-
+		this.currentBufferIndex = 0;
+		this.cells = [
+			Array2D(width, height),
+			Array2D(width, height)
+		]
+		this.randomize();
     this.clear();
   }
 
@@ -39,6 +45,7 @@ class CCA {
    * This should NOT be modified by the caller
    */
   getCells() {
+		return this.cells[this.currentBufferIndex];
   }
 
   /**
@@ -51,13 +58,64 @@ class CCA {
    * Randomize the cca grid
    */
   randomize() {
+		let buffer = this.cells[this.currentBufferIndex];
+		for (let row = 0; row < this.height; row++) {
+       for (let col = 0; col < this.width; col++) {
+				 buffer[row][col] = (Math.random() * MODULO) | 0;
+       }
+     }
   }
 
   /**
    * Run the simulation for a single step
    */
   step() {
+		let backBufferIndex = this.currentBufferIndex === 0 ? 1 : 0;
+		let currentBuffer = this.cells[this.currentBufferIndex];
+		let backBuffer = this.cells[backBufferIndex];
+
+		function hasInfectiousNeighbor(row, col) {
+			const nextValue = (currentBuffer[row][col] + 1) % MODULO;
+
+			// north
+			if (row > 0) {
+				if (currentBuffer[row - 1][col] === nextValue) {
+					return true;
+				}
+			}
+			// south
+			if (row < this.height - 1) {
+				if (currentBuffer[row + 1][col] === nextValue) {
+					return true;
+				}
+			}
+			// east
+			if (col < this.width - 1) {
+				if (currentBuffer[row][col + 1] === nextValue) {
+					return true;
+				}
+			}
+			// west
+			if (col > 0) {
+				if (currentBuffer[row][col - 1] === nextValue) {
+					return true;
+				}
+			}
+			return false;
+		}
+		
+		for (let row = 0; row < this.height; row++) {
+       for (let col = 0; col < this.width; col++) {
+				 if (hasInfectiousNeighbor.call(this, row, col)) {
+					 backBuffer[row][col] = (currentBuffer[row][col] + 1) % MODULO;
+				 } else {
+					 backBuffer[row][col] = currentBuffer[row][col];
+				 }
+			 }
+		}
+		this.currentBufferIndex = this.currentBufferIndex === 0 ? 1 : 0;
   }
+
 }
 
 export default CCA;
