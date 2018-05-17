@@ -84,58 +84,66 @@ class Life {
 
       const neighbors = [];
 
-			if (col > 0 && row > 0) {
+			if (col > 0 && row > 0 && col < w - 1 && row < h - 1) {
+				console.log({ row, col });
 				const upperLeft = currentBuffer[row -1][col - 1];
 				neighbors.push(upperLeft);
 				const left = currentBuffer[row][col - 1];
 				neighbors.push(left);
-				const lowerLeft = currentBuffer[row + 1][col -1];
-				neighbors.push(lowerLeft);
 				const upperRight = currentBuffer[row -1][col + 1];
 				neighbors.push(upperRight);
 				const upperMid = currentBuffer[row -1][col];
 				neighbors.push(upperMid);
-			}	else if (col === 0 || row === 0) {
-				const upperLeft = 'dead';
-				neighbors.push(upperLeft);
-				const left = 'dead';
-				neighbors.push(left);
-				const lowerLeft = 'dead';
-				neighbors.push(lowerLeft);
-				const upperRight = 'dead';
-				neighbors.push(upperRight);
-				const upperMid = 'dead';
-				neighbors.push(upperMid);
-			}
-				
-			if (col < w && row < h) {
-				console.log({ row, col });
-				const right = currentBuffer[row][col + 1];
-				neighbors.push(right);
 				const lowerRight = currentBuffer[row + 1][col + 1];
 				neighbors.push(lowerRight);
 				const lowerMid = currentBuffer[row + 1][col];
 				neighbors.push(lowerMid);
-			} else if (col === w || row === h) {
-				const right = 'dead';
+				const lowerLeft = currentBuffer[row + 1][col -1];
+				neighbors.push(lowerLeft);
+				const right = currentBuffer[row][col + 1];
 				neighbors.push(right);
+			}	else if (col === 0 || row === 0 || col >= w - 1 || row >= h - 1) {
+				const upperLeft = 'dead';
+				neighbors.push(upperLeft);
+				const left = 'dead';
+				neighbors.push(left);
+				const upperRight = 'dead';
+				neighbors.push(upperRight);
+				const upperMid = 'dead';
+				neighbors.push(upperMid);
 				const lowerRight = 'dead';
 				neighbors.push(lowerRight);
 				const lowerMid = 'dead';
 				neighbors.push(lowerMid);
+				const lowerLeft = 'dead';
+				neighbors.push(lowerLeft);
+				const right = 'dead';
+				neighbors.push(right);
 			}
-
 
 			let aliveCounter = 0;
       for (let neighbor of neighbors) {
 				if (neighbor === 'alive') aliveCounter++;
         console.log('neighbor', neighbor);
       }
-			if (nextValue === 'alive' && aliveCounter < 2) return true;
-			if (nextValue === 'alive' && aliveCounter === 2) return false;
-			if (nextValue === 'alive' && aliveCounter === 3) return false;
-			if (nextValue === 'alive' && aliveCounter > 3) return true;
-			if (nextValue === 'dead' && aliveCounter === 3) return false;
+			if (nextValue === 'alive') {
+				if (aliveCounter < 2) {
+					return true;
+				} else if (aliveCounter === 2 || aliveCounter === 3) {
+					return false;
+				} else if (aliveCounter > 3) {
+					return true;
+				} else {
+					return false;
+				}
+			}
+			if (nextValue === 'dead') {
+				if (aliveCounter === 3) {
+					return false;
+				} else {
+					return true;
+				}
+			}
 			return false;
 		}
     for (let row = 0; row < this.height; row++) {
