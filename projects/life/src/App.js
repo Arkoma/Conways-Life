@@ -2,52 +2,65 @@ import React, { Component } from 'react';
 import Life from './life';
 import './App.css';
 
+const COLORS = [
+  [0, 0, 0xff],
+	[0xff, 0xA5, 0]
+]
+
 /**
  * Life canvas
  */
 class LifeCanvas extends Component {
 
+  /**
+   * Constructor
+   */
   constructor(props) {
     super(props);
-
-    this.life = new Life(props.width, props.height);
-    this.life.randomize();
+		this.life = new Life(props.width, props.height);
   }
 
+  /**
+   * Component did mount
+   */
   componentDidMount() {
-		// requestAnimationFrame(() => {this.animFrame()});
-		this.animFrame();
+		requestAnimationFrame(() => {this.animFrame()});
   }
 
+  /**
+   * Handle an animation frame
+   */
   animFrame() {
-		let canvas = this.refs.canvas;
+		let cells = this.life.getCells();
+		console.log('cells? ', cells);
+		let canvas = this.refs.canvas
 		let ctx = canvas.getContext('2d');
 
-    // Request another animation frame
-    // Update life and get cells
-		let cells = this.life.getCells();
-		console.log('this', this);
-		let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);	
-			// Get canvas framebuffer, a packed RGBA array
-		let buffer = imageData.data;
-    // Convert the cell values into white or black for the canvas
 		const { width, height } = this.props;
+
+		ctx.fillStyle = 'white';
+		ctx.fillRect(0, 0, width, height);
+
+		let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+		let buffer = imageData.data;
+
 		for (let row = 0; row < height; row++) {
 			for (let col = 0; col < width; col++) {
 				let index = (row * width + col) * 4;
-				let color = this.life.COLORS.alive;
-				if (cells[row][col] === 'dead') {
-					color = this.life.COLORS.dead;
-				}
-				buffer[index + 0] = color[0];
-				buffer[index + 1] = color[1];
-				buffer[index + 2] = color[2];
+
+				let currentNumber = cells[row][col];
+				
+				buffer[index + 0] = COLORS[currentNumber][0];
+				buffer[index + 1] = COLORS[currentNumber][1];
+				buffer[index + 2] = COLORS[currentNumber][2];
 				buffer[index + 3] = 0xff;
+				
 			}
 		}
-    // Put the new image data back on the canvas
+
 		ctx.putImageData(imageData, 0, 0);
-    // Next generation of life
+		
 		this.life.step();
 		requestAnimationFrame(() => {this.animFrame()});
   }
@@ -55,8 +68,9 @@ class LifeCanvas extends Component {
   /**
    * Render
    */
-  render() {
-    return <canvas ref="canvas" width={this.props.width} height={this.props.height} />
+	render() {
+		return <canvas ref="canvas" width={this.props.width} height={this.props.height} />
+
   }
 }
 
@@ -71,7 +85,7 @@ class LifeApp extends Component {
   render() {
     return (
       <div>
-        <LifeCanvas width={10} height={10} />
+        <LifeCanvas width={800} height={600} />
       </div>
     )
   }

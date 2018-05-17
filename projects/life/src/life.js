@@ -1,5 +1,5 @@
 /**
- * Implementation of Conway's game of Life
+ * Implemention of a Life
  */
 
 /**
@@ -7,15 +7,16 @@
  */
 function Array2D(width, height) {
   //NOTE:  Iterate through Array2D row first then column
-  let a = new Array(height);
-
-  for (let i = 0; i < height; i++) {
-    a[i] = new Array(width);
-  }
-
-  return a;
+	let a = new Array(height);
+  
+	for (let i = 0; i < height; i++) {
+	  a[i] = new Array(width);
+	}
+  
+	return a;
 }
 
+  
 /**
  * Life class
  */
@@ -24,22 +25,19 @@ class Life {
   /**
    * Constructor
    */
-  constructor(width, height, cells) {
-		this.width = width;
-		this.height = height;
+  constructor(width, height) {
+    this.width = width;
+    this.height = height;
 		this.currentBufferIndex = 0;
 		this.cells = [
 			Array2D(width, height),
 			Array2D(width, height)
 		]
 		this.randomize();
-		this.COLORS = {
-			'alive': [0, 0, 0],
-			'dead' : [0xff, 0xff, 0xff]
-		}
+
 		this.clear();
   }
-  
+
   /**
    * Return the current active buffer
    * 
@@ -50,22 +48,29 @@ class Life {
   }
 
   /**
-   * Clear the life grid
+   * Clear the cca grid
    */
   clear() {
-    // !!!! IMPLEMENT ME !!!!
+		// const choice = Math.floor(Math.random() * 2);
+		// let current = this.cells[this.currentBufferIndex]
+		// for (let row = 0; row < this.height; row++) {
+		//  for (let col = 0; col < this.width; col++) {
+		//		current[row][col] = choice;
+		//	}
+		// }
+		
   }
-  
+
   /**
-   * Randomize the life grid
+   * Randomize the cca grid
    */
   randomize() {
 		let buffer = this.cells[this.currentBufferIndex];
-    for (let row = 0; row < this.height; row++) {
-      for (let col = 0; col < this.width; col++) {
-        buffer[row][col] = 'alive';
-      }
-    }
+		for (let row = 0; row < this.height; row++) {
+       for (let col = 0; col < this.width; col++) {
+				 buffer[row][col] = Math.floor(Math.random() * 2) | 0;
+       }
+     }
   }
 
   /**
@@ -73,91 +78,92 @@ class Life {
    */
   step() {
 		let backBufferIndex = this.currentBufferIndex === 0 ? 1 : 0;
-    let currentBuffer = this.cells[this.currentBufferIndex];
-    let backBuffer = this.cells[backBufferIndex];
+		let currentBuffer = this.cells[this.currentBufferIndex];
+		let backBuffer = this.cells[backBufferIndex];
 
-    function hasToDie(row, col) {
-      const w = this.width;
-      const h = this.height;
-      const nextValue = currentBuffer[row][col];
-			// console.log({ nextValue, currentBuffer, row, col });
+		function countNeigbors(row, col) {
+			let livingNeighbors = 0;
 
-      const neighbors = [];
-
-			if (col > 0 && row > 0 && col < w - 1 && row < h - 1) {
-				console.log({ row, col });
-				const upperLeft = currentBuffer[row -1][col - 1];
-				neighbors.push(upperLeft);
-				const left = currentBuffer[row][col - 1];
-				neighbors.push(left);
-				const upperRight = currentBuffer[row -1][col + 1];
-				neighbors.push(upperRight);
-				const upperMid = currentBuffer[row -1][col];
-				neighbors.push(upperMid);
-				const lowerRight = currentBuffer[row + 1][col + 1];
-				neighbors.push(lowerRight);
-				const lowerMid = currentBuffer[row + 1][col];
-				neighbors.push(lowerMid);
-				const lowerLeft = currentBuffer[row + 1][col -1];
-				neighbors.push(lowerLeft);
-				const right = currentBuffer[row][col + 1];
-				neighbors.push(right);
-			}	else if (col === 0 || row === 0 || col >= w - 1 || row >= h - 1) {
-				const upperLeft = 'dead';
-				neighbors.push(upperLeft);
-				const left = 'dead';
-				neighbors.push(left);
-				const upperRight = 'dead';
-				neighbors.push(upperRight);
-				const upperMid = 'dead';
-				neighbors.push(upperMid);
-				const lowerRight = 'dead';
-				neighbors.push(lowerRight);
-				const lowerMid = 'dead';
-				neighbors.push(lowerMid);
-				const lowerLeft = 'dead';
-				neighbors.push(lowerLeft);
-				const right = 'dead';
-				neighbors.push(right);
-			}
-
-			let aliveCounter = 0;
-      for (let neighbor of neighbors) {
-				if (neighbor === 'alive') aliveCounter++;
-        console.log('neighbor', neighbor);
-      }
-			if (nextValue === 'alive') {
-				if (aliveCounter < 2) {
-					return true;
-				} else if (aliveCounter === 2 || aliveCounter === 3) {
-					return false;
-				} else if (aliveCounter > 3) {
-					return true;
-				} else {
-					return false;
+			// northwest
+			if (row > 0 && col > 0) {
+				if (currentBuffer[row - 1][col - 1] === 1) {
+					livingNeighbors++;
 				}
 			}
-			if (nextValue === 'dead') {
-				if (aliveCounter === 3) {
-					return false;
-				} else {
-					return true;
+				
+			// north
+			if (row > 0) {
+				if (currentBuffer[row - 1][col] === 1) {
+					livingNeighbors++;
 				}
 			}
-			return false;
+
+			// northeast
+			if (row > 0 && col < this.width - 1) {
+				if (currentBuffer[row - 1][col + 1] === 1) {
+					livingNeighbors++;
+				}
+			}
+			
+			// east
+			if (col < this.width - 1) {
+				if (currentBuffer[row][col + 1] === 1) {
+					livingNeighbors++;
+				}
+			}
+			
+			// southeast
+			if (row < this.height - 1 && col < this.width - 1) {
+				if (currentBuffer[row + 1][col + 1] === 1) {
+					livingNeighbors++;
+				}
+			}
+			
+			// south
+			if (row < this.height - 1) {
+				if (currentBuffer[row + 1][col] === 1) {
+					livingNeighbors++;
+				}
+			}
+			
+			// southwest
+			if (row < this.height - 1 && col > 0)  {
+				if (currentBuffer[row + 1][col - 1] === 1) {
+					livingNeighbors++;
+				}
+			}
+			
+			// west
+			if (col > 0) {
+				if (currentBuffer[row][col - 1] === 1) {
+					livingNeighbors++;
+				}
+			}
+			return livingNeighbors;
 		}
-    for (let row = 0; row < this.height; row++) {
-      for (let col = 0; col < this.width; col++) {
-        if (hasToDie.call(this, row, col)) {
-					backBuffer[row][col] = 'dead';
-        } else {
-					backBuffer[row][col] = 'alive';
-        }
-      }
-   }
-   this.currentBufferIndex = this.currentBufferIndex === 0 ? 1 : 0;
-	
-  }
+		
+		for (let row = 0; row < this.height; row++) {
+       for (let col = 0; col < this.width; col++) {
+				 const totalNeighbors = countNeigbors.call(this, row, col);
+
+				 if (currentBuffer[row][col] === 1) {
+					 if (totalNeighbors < 2 || totalNeighbors > 3) {
+							backBuffer[row][col] = 0;
+					 } else {
+						 backBuffer[row][col] = currentBuffer[row][col];
+					 }
+				 } else {
+					 if (totalNeighbors === 3){
+						 backBuffer[row][col] = 1;
+					 } else {
+						 backBuffer[row][col] = currentBuffer[row][col];
+					 }
+				 }
+				 
+			}
+			this.currentBufferIndex = this.currentBufferIndex === 0 ? 1 : 0;
+		}
+	} 
 }
 
 export default Life;
